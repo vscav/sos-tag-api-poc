@@ -20,19 +20,19 @@ const ObjectsResponse = <T>(TItemSchema: ClassType<T>): any => {
   return GenericObjectsResponse;
 };
 
-@ObjectType()
+@ObjectType({ description: 'Error with message' })
 class SimpleError {
   @Field()
   message: string;
 }
 
-@ObjectType()
+@ObjectType({ description: 'Error with message and the field associated' })
 class FieldError extends SimpleError {
   @Field()
   field: string;
 }
 
-@ObjectType()
+@ObjectType({ description: 'Errors (simple or with field)' })
 class Errors {
   @Field(() => [FieldError], { nullable: true })
   errors?: (SimpleError | FieldError)[];

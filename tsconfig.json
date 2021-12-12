@@ -3,6 +3,7 @@
   "compilerOptions": {
     "target": "es2017",
     "lib": ["es2017", "esnext.asynciterable"],
+    "types": ["node"],
     "typeRoots": ["@types", "node_modules/@types"],
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,

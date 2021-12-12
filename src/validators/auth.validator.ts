@@ -1,5 +1,6 @@
 import { LoginInput, RegisterInput } from '@dtos/auth.dto';
 import { filterObject, isEmpty } from '@utils/object';
+import { generateFieldErrors } from './utils/errors';
 import { emptyArgsExist, isEmailValid, isPasswordValid, isPhoneValid } from './utils/validate';
 
 const checkLoginValidity = (loginInput: LoginInput) => {
@@ -23,21 +24,6 @@ const checkRegisterValidity = (registerInput: RegisterInput) => {
   if (!isEmpty(invalidArgs)) return generateFieldErrors(invalidArgs);
 
   return;
-};
-
-const generateFieldErrors = (errorMessages: { [fieldName: string]: string }) => {
-  const errorsMap = {
-    errors: [],
-  };
-
-  for (const [field, message] of Object.entries(errorMessages)) {
-    errorsMap.errors.push({
-      field,
-      message,
-    });
-  }
-
-  return errorsMap;
 };
 
 export { checkLoginValidity, checkRegisterValidity };

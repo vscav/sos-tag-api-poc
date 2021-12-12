@@ -9,7 +9,7 @@ import { Service } from 'typedi';
 import { BooleanResponse, SingleObjectResponse } from '@responses';
 import { AccountResponse } from './account.resolver';
 
-@ObjectType()
+@ObjectType({ description: 'Login response data' })
 class LoginResponseData {
   @Field(() => AccountSchema)
   account: IAccount;
