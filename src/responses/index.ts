@@ -1,7 +1,7 @@
 import { ClassType, Field, ObjectType } from 'type-graphql';
 
 const SingleObjectResponse = <T>(TItemSchema: ClassType<T>): any => {
-  @ObjectType({ description: 'Generic response', isAbstract: true })
+  @ObjectType({ description: 'Generic single object response', isAbstract: true })
   abstract class GenericSingleObjectResponse extends Errors {
     @Field(() => TItemSchema, { nullable: true })
     response?: T;
@@ -11,7 +11,7 @@ const SingleObjectResponse = <T>(TItemSchema: ClassType<T>): any => {
 };
 
 const ObjectsResponse = <T>(TItemSchema: ClassType<T>): any => {
-  @ObjectType({ description: 'Generic response', isAbstract: true })
+  @ObjectType({ description: 'Generic multiple objects response', isAbstract: true })
   abstract class GenericObjectsResponse extends Errors {
     @Field(() => [TItemSchema], { nullable: true })
     response?: T[];
