@@ -1,10 +1,10 @@
 import { confirmAccountPrefix, forgotPasswordPrefix } from '@constants/redis-prefixes';
 import nodemailer from 'nodemailer';
-import { v4 } from 'uuid';
+import { nanoid } from 'nanoid';
 import { redis } from '../redis';
 
 const createConfirmationUrl = async (accountId: string) => {
-  const token = v4();
+  const token = nanoid();
   await redis.set(confirmAccountPrefix + token, accountId, 'ex', 60 * 60 * 24); // 1 day expiration
 
   // Must correspond to the dedicated route on the frontend
@@ -12,7 +12,7 @@ const createConfirmationUrl = async (accountId: string) => {
 };
 
 const createForgotPasswordUrl = async (accountId: string) => {
-  const token = v4();
+  const token = nanoid();
   await redis.set(forgotPasswordPrefix + token, accountId, 'ex', 60 * 60 * 24); // 1 day expiration
 
   // Must correspond to the dedicated route on the frontend
