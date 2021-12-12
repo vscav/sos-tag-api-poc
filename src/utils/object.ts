@@ -12,7 +12,7 @@ const isEmpty = (value: string | number | object): boolean => {
   return false;
 };
 
-const filterObject = (obj: Object, predicate: Function): Object =>
+const filterObject = (obj: Object, predicate: Function): any =>
   Object.keys(obj)
     .filter(key => predicate(obj[key]))
     .reduce((res, key) => ((res[key] = obj[key]), res), {});

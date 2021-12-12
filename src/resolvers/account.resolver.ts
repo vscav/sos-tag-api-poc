@@ -1,24 +1,29 @@
 import Context from '@interfaces/context.interface';
 import { isAuth } from '@middlewares/is-auth.middleware';
-import { IAccount } from '@models/account.model';
+import { ObjectsResponse, SingleObjectResponse } from '@responses';
 import AccountSchema from '@schemas/account.schema';
 import AccountService from '@services/account.service';
 import { logger } from '@utils/logger';
 import 'dotenv/config';
 import { verify } from 'jsonwebtoken';
-import { Arg, Ctx, Mutation, Query, Resolver, UseMiddleware } from 'type-graphql';
+import { Arg, Ctx, ObjectType, Query, Resolver, UseMiddleware } from 'type-graphql';
 import { Service } from 'typedi';
-import { transformAccount } from './utils/transform';
 
 const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
+
+@ObjectType({ description: 'Account response' })
+class AccountResponse extends SingleObjectResponse(AccountSchema) {}
+
+@ObjectType({ description: 'Accounts response' })
+class AccountsResponse extends ObjectsResponse(AccountSchema) {}
 
 @Service()
 @Resolver(() => AccountSchema)
 class AccountResolver {
   constructor(private readonly accountService: AccountService) {}
 
-  @Query(() => AccountSchema, { nullable: true })
-  async currentAccount(@Ctx() { req }: Context): Promise<IAccount | null> {
+  @Query(() => AccountResponse)
+  async currentAccount(@Ctx() { req }: Context): Promise<AccountResponse> {
     const authorization = req.headers['authorization'];
     if (!authorization) {
       return null;
@@ -28,7 +33,6 @@ class AccountResolver {
       const token = authorization.split(' ')[1];
       const payload: any = verify(token, accessTokenSecret);
       const currentAccount = await this.accountById(payload.accountId);
-      logger.info(`[resolver:Account:currentAccount] Current logged in account is ${currentAccount.firstname} ${currentAccount.lastname}.`);
       return currentAccount;
     } catch (error) {
       logger.error(`[resolver:Account:currentAccount] ${error.message}.`);
@@ -36,42 +40,24 @@ class AccountResolver {
     }
   }
 
-  // IMPORTANT: Testing mutation only. We don't want to expose the possibility of revoking
-  // token for a specific account. We would prefer to have a specific method (like "forgotPassword" for example)
-  // which will use this kind of process. Maybe we also want to apply roles restriction to this mutation.
-  @Mutation(() => Boolean)
+  @Query(() => AccountResponse)
   @UseMiddleware(isAuth)
-  async revokeRefreshTokensByAccountId(@Arg('accountId') accountId: string): Promise<boolean> {
+  async accountById(@Arg('accountId') accountId: string): Promise<AccountResponse> {
     try {
-      const success = await this.accountService.revokeRefreshTokensByAccountId(accountId);
-      logger.info(`[resolver:User:revokeRefreshTokensForUser] Revoke refresh token.`);
-      return success;
-    } catch (error) {
-      logger.error(`[resolver:User:revokeRefreshTokensForUser] ${error.message}.`);
-      throw error;
-    }
-  }
-
-  @Query(() => AccountSchema, { nullable: true })
-  @UseMiddleware(isAuth)
-  async accountById(@Arg('accountId') accountId: string): Promise<IAccount | null> {
-    try {
-      const account: IAccount = await this.accountService.findAccountById(accountId);
-      logger.info(`[resolver:Account:accountByID] Find account ${account.firstname} ${account.lastname}.`);
-      return transformAccount(account);
+      const account = await this.accountService.findAccountById(accountId);
+      return account;
     } catch (error) {
       logger.error(`[resolver:Account:accountByID] ${error.message}.`);
       throw error;
     }
   }
 
-  @Query(() => [AccountSchema])
+  @Query(() => AccountsResponse)
   @UseMiddleware(isAuth)
-  async accounts(): Promise<IAccount[]> {
+  async accounts(): Promise<AccountsResponse> {
     try {
       const accounts = await this.accountService.findAccounts();
-      logger.info(`[resolver:Account:accounts] Find ${accounts.length} account${accounts.length > 0 ? 's' : ''}.`);
-      return accounts.map(account => transformAccount(account));
+      return accounts;
     } catch (error) {
       logger.error(`[resolver:Account:accounts] ${error.message}.`);
       throw error;
@@ -79,4 +65,5 @@ class AccountResolver {
   }
 }
 
+export { AccountResponse, AccountsResponse };
 export default AccountResolver;

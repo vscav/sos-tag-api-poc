@@ -1,52 +1,43 @@
 import { LoginInput, RegisterInput } from '@dtos/auth.dto';
-import { emptyInputsExist, isEmailValid, isPasswordValid, isPhoneValid } from './utils/validate';
+import { filterObject, isEmpty } from '@utils/object';
+import { emptyArgsExist, isEmailValid, isPasswordValid, isPhoneValid } from './utils/validate';
 
 const checkLoginValidity = (loginInput: LoginInput) => {
-  emptyInputsExist(loginInput);
-  // const emptyInput = emptyInputsExist(loginInput);
-  // if (!isEmpty(emptyInput)) return generateErrors(emptyInput);
+  const emptyArgs = emptyArgsExist(loginInput);
+  if (!isEmpty(emptyArgs)) return generateFieldErrors(emptyArgs);
 };
 
 const checkRegisterValidity = (registerInput: RegisterInput) => {
-  emptyInputsExist(registerInput);
+  const emptyArgs = emptyArgsExist(registerInput);
+  if (!isEmpty(emptyArgs)) return generateFieldErrors(emptyArgs);
 
   const { email, phone, password } = registerInput;
-  isEmailValid(email);
-  isPhoneValid(phone);
-  isPasswordValid(password);
+  const argsToValidate = {
+    email: isEmailValid(email),
+    phone: isPhoneValid(phone),
+    password: isPasswordValid(password),
+  };
 
-  // const emptyInput = emptyInputsExist(registerInput);
-  // if (!isEmpty(emptyInput)) return generateErrors(emptyInput);
+  const invalidArgs = filterObject(argsToValidate, (input: string) => input !== null);
 
-  // const { email, phone, password } = registerInput;
-  // const inputsToValidate = {
-  //   email: isEmailValid(email),
-  //   phone: isPhoneValid(phone),
-  //   password: isPasswordValid(password),
-  // };
+  if (!isEmpty(invalidArgs)) return generateFieldErrors(invalidArgs);
 
-  // const invalidInputs = filterObject(inputsToValidate, input => input !== null);
-
-  // if (!isEmpty(invalidInputs)) {
-  //   return generateErrors(invalidInputs);
-  // }
-
-  // return null;
+  return;
 };
 
-// const generateErrors = (errorMessages: { [fieldName: string]: string }) => {
-//   const errorsMap = {
-//     errors: [],
-//   };
+const generateFieldErrors = (errorMessages: { [fieldName: string]: string }) => {
+  const errorsMap = {
+    errors: [],
+  };
 
-//   for (const [field, message] of Object.entries(errorMessages)) {
-//     errorsMap.errors.push({
-//       field,
-//       message,
-//     });
-//   }
+  for (const [field, message] of Object.entries(errorMessages)) {
+    errorsMap.errors.push({
+      field,
+      message,
+    });
+  }
 
-//   return errorsMap;
-// };
+  return errorsMap;
+};
 
 export { checkLoginValidity, checkRegisterValidity };

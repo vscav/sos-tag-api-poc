@@ -36,7 +36,7 @@ const sendEmail = async (recipientEmail: string, subject: string, url: string): 
   });
 
   const mailOptions = {
-    from: '"Fred Foo 👻" <foo@example.com>', // sender address
+    from: '"SOS-Tag ➕" <sos-tag@gmail.com>', // sender address
     to: recipientEmail,
     subject: `SOS-Tag - ${subject}`, // Subject line
     // text: 'Hello world?', // plain text body

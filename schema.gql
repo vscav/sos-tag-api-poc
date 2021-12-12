@@ -18,10 +18,33 @@ type Account {
   users: [User]
 }
 
+"""Account response"""
+type AccountResponse {
+  errors: [FieldError!]
+  response: Account
+}
+
+"""Accounts response"""
+type AccountsResponse {
+  errors: [FieldError!]
+  response: [Account!]
+}
+
+"""Boolean response"""
+type BooleanResponse {
+  errors: [FieldError!]
+  response: Boolean
+}
+
 """Change password input"""
 input ChangePasswordInput {
   password: String
   token: String
+}
+
+type FieldError {
+  field: String
+  message: String
 }
 
 """Login input"""
@@ -32,24 +55,28 @@ input LoginInput {
 
 """Login response"""
 type LoginResponse {
+  errors: [FieldError!]
+  response: LoginResponseData
+}
+
+type LoginResponseData {
   accessToken: String
   account: Account
 }
 
 type Mutation {
   changePassword(changePasswordInput: ChangePasswordInput): Account
-  confirmAccount(token: String): Boolean
-  forgotPassword(accountEmail: String): Boolean
+  confirmAccount(token: String): BooleanResponse
+  forgotPassword(accountEmail: String): BooleanResponse
   login(loginInput: LoginInput): LoginResponse
-  logout: Boolean
-  register(registerInput: RegisterInput): Account
-  revokeRefreshTokensByAccountId(accountId: String): Boolean
+  logout: BooleanResponse
+  register(registerInput: RegisterInput): AccountResponse
 }
 
 type Query {
-  accountById(accountId: String): Account
-  accounts: [Account]
-  currentAccount: Account
+  accountById(accountId: String): AccountResponse
+  accounts: AccountsResponse
+  currentAccount: AccountResponse
 }
 
 """Register input"""

@@ -1,5 +1,6 @@
-import User from '@schemas/user.schema';
 import { IUser, IUserModel } from '@models/user.model';
+import { UserResponse } from '@resolvers/user.resolver';
+import { transformUser } from '@services/utils/transform';
 import { isEmpty } from '@utils/object';
 import { Inject, Service } from 'typedi';
 
@@ -7,27 +8,32 @@ import { Inject, Service } from 'typedi';
 class UserService {
   constructor(@Inject('USER') private readonly users: IUserModel) {}
 
-  async findUserById(userId: string): Promise<IUser | null> {
-    if (isEmpty(userId)) throw new Error('Empty userId parameter');
+  async findUserById(userId: string): Promise<UserResponse> {
+    if (isEmpty(userId))
+      return {
+        errors: [
+          {
+            message: 'Empty userId parameter.',
+          },
+        ],
+      };
 
     const user: IUser = await this.users.findOne({ _id: userId });
-    if (!user) throw new Error('User not found');
+    if (!user)
+      return {
+        errors: [
+          {
+            message: 'User not found.',
+          },
+        ],
+      };
 
-    return user;
+    return { response: transformUser(user) };
   }
 
-  async findUsers(): Promise<User[]> {
-    const users: any = await this.users.find();
-    return users;
-  }
-
-  async revokeRefreshTokensByUserId(userId: string): Promise<boolean> {
-    if (isEmpty(userId)) throw new Error('Empty userId parameter');
-
-    const updatedUser = await this.users.findOneAndUpdate({ _id: userId }, { $inc: { tokenVersion: 1 } });
-    if (!updatedUser) throw new Error('User not found');
-
-    return true;
+  async findUsers(): Promise<UserResponse> {
+    const users: IUser[] = await this.users.find();
+    return { response: users.map((user: IUser) => transformUser(user)) };
   }
 }
 

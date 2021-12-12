@@ -1,8 +1,10 @@
 import { confirmAccountPrefix, forgotPasswordPrefix } from '@constants/redis-prefixes';
 import { ChangePasswordInput, LoginInput, RegisterInput } from '@dtos/auth.dto';
 import { IAccount, IAccountModel } from '@models/account.model';
+import { AccountResponse } from '@resolvers/account.resolver';
 import { LoginResponse } from '@resolvers/auth.resolver';
-import { transformAccount } from '@resolvers/utils/transform';
+import { BooleanResponse } from '@responses';
+import { transformAccount } from '@services/utils/transform';
 import { createConfirmationUrl, createForgotPasswordUrl, sendEmail } from '@utils/email';
 import { createAccessToken, createRefreshToken, sendRefreshToken } from '@utils/token';
 import { checkLoginValidity, checkRegisterValidity } from '@validators/auth.validator';
@@ -15,50 +17,99 @@ import { redis } from '../redis';
 class AuthService {
   constructor(@Inject('ACCOUNT') private readonly accounts: IAccountModel) {}
 
-  async changePassword({ token, password }: ChangePasswordInput): Promise<IAccount | null> {
+  async changePassword({ token, password }: ChangePasswordInput): Promise<AccountResponse> {
     const accountId = await redis.get(forgotPasswordPrefix + token);
-    if (!accountId) throw new Error('Password modification process has expired. Resend a new email to change this account password.');
+    if (!accountId)
+      return {
+        errors: [
+          {
+            message: 'Password modification process has expired. Resend a new email to change this account password.',
+          },
+        ],
+      };
 
     const account: IAccount = await this.accounts.findOne({ _id: accountId });
-    if (!account) throw new Error('Account not found');
+    if (!account)
+      return {
+        errors: [
+          {
+            message: 'Account not found.',
+          },
+        ],
+      };
 
     await redis.del(forgotPasswordPrefix + token);
 
     account.password = await hash(password, 12);
 
-    return await account.save();
+    return { response: transformAccount(await account.save()) };
   }
 
-  async confirmAccount(token: string): Promise<boolean> {
+  async confirmAccount(token: string): Promise<BooleanResponse> {
     const accountId = await redis.get(confirmAccountPrefix + token);
-    if (!accountId) throw new Error('Confirmation process has expired. Resend a new confirmation email.');
+    if (!accountId)
+      return {
+        errors: [
+          {
+            message: 'Confirmation process has expired. Resend a new confirmation email.',
+          },
+        ],
+      };
 
     await this.accounts.findOneAndUpdate({ _id: accountId }, { confirmed: true });
 
     await redis.del(confirmAccountPrefix + token);
 
-    return true;
+    return { response: true };
   }
 
-  async forgotPassword(accountEmail: string): Promise<boolean> {
+  async forgotPassword(accountEmail: string): Promise<BooleanResponse> {
     const account: IAccount = await this.accounts.findOne({ email: accountEmail });
-    if (!account) throw new Error('Account not found');
+    if (!account)
+      return {
+        errors: [
+          {
+            message: 'Account not found.',
+          },
+        ],
+      };
 
     await sendEmail(accountEmail, 'Change your account password', await createForgotPasswordUrl(account.id));
 
-    return true;
+    return { response: true };
   }
 
   async login({ email, password }: LoginInput, res: Response): Promise<LoginResponse> {
     checkLoginValidity({ email, password });
 
     const account = await this.accounts.findOne({ email });
-    if (!account) throw new Error('Account does not exist.');
+    if (!account)
+      return {
+        errors: [
+          {
+            message: 'Account does not exist.',
+          },
+        ],
+      };
 
     const valid = await compare(password, account.password);
-    if (!valid) throw new Error('Password is incorrect.');
+    if (!valid)
+      return {
+        errors: [
+          {
+            message: 'Password is incorrect.',
+          },
+        ],
+      };
 
-    if (!account.confirmed) throw new Error('Account must be validated.');
+    if (!account.confirmed)
+      return {
+        errors: [
+          {
+            message: 'Account must be validated.',
+          },
+        ],
+      };
 
     const accessToken = createAccessToken(account);
     const refreshToken = createRefreshToken(account);
@@ -66,21 +117,31 @@ class AuthService {
     sendRefreshToken(res, refreshToken);
 
     return {
-      account: transformAccount(account),
-      accessToken: accessToken,
+      response: {
+        account: transformAccount(account),
+        accessToken: accessToken,
+      },
     };
   }
 
-  async logout(res: Response): Promise<boolean> {
+  async logout(res: Response): Promise<BooleanResponse> {
     sendRefreshToken(res, '');
-    return true;
+    return { response: true };
   }
 
-  async register({ firstname, lastname, email, phone, password }: RegisterInput): Promise<IAccount | null> {
-    checkRegisterValidity({ firstname, lastname, email, phone, password });
+  async register({ firstname, lastname, email, phone, password }: RegisterInput): Promise<AccountResponse> {
+    const errors = checkRegisterValidity({ firstname, lastname, email, phone, password });
+    if (errors) return errors;
 
     const accountFound = await this.accounts.findOne({ email });
-    if (accountFound) throw new Error('Account already exists.');
+    if (accountFound)
+      return {
+        errors: [
+          {
+            message: 'Account already exists.',
+          },
+        ],
+      };
 
     const hashedPassword = await hash(password, 12);
 
@@ -94,7 +155,7 @@ class AuthService {
 
     await sendEmail(email, 'Confirm your account', await createConfirmationUrl(account.id));
 
-    return await account.save();
+    return { response: transformAccount(await account.save()) };
   }
 }
 
