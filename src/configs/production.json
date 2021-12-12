@@ -1,0 +1,21 @@
+{
+  "env": "production",
+  "dbConfig": {
+      "user": "vincent",
+      "database": "sos-tag-prod"
+  },
+  "accessToken": {
+      "duration": 15
+  },
+  "refreshToken": {
+      "duration": 7
+  },
+  "log": {
+      "format": "combined",
+      "dir": "../logs"
+  },
+  "cors": {
+      "origin": "domain.will.go.here",
+      "credentials": true
+  }
+}

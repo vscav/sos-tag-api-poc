@@ -1,1 +1,1 @@
-# sos-tag-api-poc
+# SOS Tag API (POC)
