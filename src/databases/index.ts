@@ -1,6 +1,6 @@
 import dbConfig from '@interfaces/db.interface';
 import config from 'config';
-import 'dotenv/config';
+import 'dotenv-safe/config';
 
 const { user, database }: dbConfig = config.get('dbConfig');
 

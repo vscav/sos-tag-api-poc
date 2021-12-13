@@ -15,7 +15,7 @@
       "dir": "../logs"
   },
   "cors": {
-      "origin": "domain.will.go.here",
+      "origin": true,
       "credentials": true
   }
 }

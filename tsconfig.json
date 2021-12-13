@@ -15,6 +15,7 @@
     "sourceMap": true,
     "declaration": true,
     "outDir": "./dist",
+    "rootDir": ".",
     "allowJs": true,
     "noEmit": false,
     "esModuleInterop": true,

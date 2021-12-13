@@ -1,0 +1,11 @@
+version: "3.8"
+services:
+  web:
+    image: sos-tag-api-v1
+    depends_on:
+      - redis
+    ports: 
+      - "8080:8080"
+  redis:
+    image: redis:latest
+    command: ["redis-server", "--bind", "redis", "--port", "6379"]

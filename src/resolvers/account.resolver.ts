@@ -4,7 +4,7 @@ import { ObjectsResponse, SingleObjectResponse } from '@responses';
 import AccountSchema from '@schemas/account.schema';
 import AccountService from '@services/account.service';
 import { logger } from '@utils/logger';
-import 'dotenv/config';
+// import 'dotenv-safe/config';
 import { verify } from 'jsonwebtoken';
 import { Arg, Ctx, ObjectType, Query, Resolver, UseMiddleware } from 'type-graphql';
 import { Service } from 'typedi';
@@ -53,7 +53,7 @@ class AccountResolver {
   }
 
   @Query(() => AccountsResponse)
-  @UseMiddleware(isAuth)
+  // @UseMiddleware(isAuth)
   async accounts(): Promise<AccountsResponse> {
     try {
       const accounts = await this.accountService.findAccounts();

@@ -2,7 +2,7 @@ process.env['NODE_CONFIG_DIR'] = __dirname + '/configs';
 
 import 'reflect-metadata';
 
-import dbConnection from '@databases';
+import dbConnection from './databases';
 import Context from '@interfaces/context.interface';
 import AccountModel from '@models/account.model';
 import UserResolver from '@resolvers/account.resolver';
@@ -14,7 +14,7 @@ import compression from 'compression';
 import config from 'config';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import 'dotenv/config';
+import 'dotenv-safe/config';
 import express from 'express';
 import helmet from 'helmet';
 import hpp from 'hpp';
@@ -59,12 +59,15 @@ const start = async () => {
   }
   logger.info('[mongoose:connect] The connection with the database has been established successfully.');
 
+  app.set('proxy', 1);
+
   // Apply middlewares
   env === 'production' && app.use(morgan(config.get('log.format'), { stream }));
   app.use(cors({ origin: config.get('cors.origin'), credentials: config.get('cors.credentials') }));
   app.use(cookieParser());
   app.use(hpp());
   app.use(helmet({ contentSecurityPolicy: env === 'production' ? undefined : false }));
+  // app.use(helmet({ contentSecurityPolicy: env === 'production' ? false : false }));
   app.use(compression());
 
   // Define routes
@@ -84,7 +87,7 @@ const start = async () => {
 
   server.applyMiddleware({ app, cors: false });
 
-  app.listen(port, () => {
+  app.listen(typeof port === 'string' ? parseInt(port) : port, () => {
     logger.info(`=================================`);
     logger.info(`======= ENV: ${env} ========`);
     logger.info(`  App listening on port ${port}  `);
