@@ -2,6 +2,7 @@
 FROM node:14 as common-build-stage
 
 COPY . ./app
+COPY .env.production .env
 
 WORKDIR /app
 

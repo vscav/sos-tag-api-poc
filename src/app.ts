@@ -5,7 +5,8 @@ import 'reflect-metadata';
 import dbConnection from './databases';
 import Context from '@interfaces/context.interface';
 import AccountModel from '@models/account.model';
-import UserResolver from '@resolvers/account.resolver';
+import AccountResolver from '@resolvers/account.resolver';
+import UserResolver from '@resolvers/user.resolver';
 import AuthResolver from '@resolvers/auth.resolver';
 import { logger, stream } from '@utils/logger';
 import validateEnv from '@utils/validate-env';
@@ -23,7 +24,8 @@ import morgan from 'morgan';
 import { buildSchema } from 'type-graphql';
 import { Container } from 'typedi';
 import { refreshToken } from 'utils/token';
-import UserModel from './models/user.model';
+import UserModel from '@models/user.model';
+import { __prod__ } from '@constants/env';
 
 Container.set({ id: 'ACCOUNT', factory: () => AccountModel });
 Container.set({ id: 'USER', factory: () => UserModel });
@@ -36,7 +38,7 @@ const start = async () => {
 
   // Build graphql schema (and pass the container data models to use in services)
   const schema = await buildSchema({
-    resolvers: [AuthResolver, UserResolver],
+    resolvers: [AccountResolver, AuthResolver, UserResolver],
     emitSchemaFile: true,
     nullableByDefault: true,
     container: Container,
@@ -62,12 +64,12 @@ const start = async () => {
   app.set('proxy', 1);
 
   // Apply middlewares
-  env === 'production' && app.use(morgan(config.get('log.format'), { stream }));
+  __prod__ && app.use(morgan(config.get('log.format'), { stream }));
   app.use(cors({ origin: config.get('cors.origin'), credentials: config.get('cors.credentials') }));
   app.use(cookieParser());
   app.use(hpp());
-  app.use(helmet({ contentSecurityPolicy: env === 'production' ? undefined : false }));
-  // app.use(helmet({ contentSecurityPolicy: env === 'production' ? false : false }));
+  app.use(helmet({ contentSecurityPolicy: __prod__ ? undefined : false }));
+  // app.use(helmet({ contentSecurityPolicy: __prod__ ? false : false }));
   app.use(compression());
 
   // Define routes

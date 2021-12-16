@@ -4,7 +4,7 @@ import { IAccount } from '@models/account.model';
 import AccountSchema from '@schemas/account.schema';
 import AuthService from '@services/auth.service';
 import { logger } from '@utils/logger';
-import { Arg, Ctx, Field, Mutation, ObjectType, Resolver } from 'type-graphql';
+import { Arg, Ctx, Field, Mutation, ObjectType, Query, Resolver } from 'type-graphql';
 import { Service } from 'typedi';
 import { BooleanResponse, SingleObjectResponse } from '@responses';
 import { AccountResponse } from './account.resolver';
@@ -24,6 +24,15 @@ class LoginResponse extends SingleObjectResponse(LoginResponseData) {}
 @Resolver(() => AccountSchema)
 class AuthResolver {
   constructor(private readonly authService: AuthService) {}
+
+  @Query(() => String)
+  async hello(): Promise<string> {
+    try {
+      return 'hello with docker';
+    } catch (error) {
+      throw error;
+    }
+  }
 
   @Mutation(() => AccountSchema)
   async changePassword(@Arg('changePasswordInput') changePasswordInput: ChangePasswordInput): Promise<AccountResponse> {

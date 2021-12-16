@@ -1,11 +1,14 @@
 version: "3.8"
 services:
+  redis:
+    image: redis:latest
+    hostname: redis
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--bind", "redis", "--port", "6379"]
   web:
-    image: sos-tag-api-v1
+    image: vscav/sos-tag-api:beta
     depends_on:
       - redis
     ports: 
       - "8080:8080"
-  redis:
-    image: redis:latest
-    command: ["redis-server", "--bind", "redis", "--port", "6379"]

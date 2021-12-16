@@ -7,7 +7,13 @@ import { BooleanResponse } from '@responses';
 import { transformAccount } from '@services/utils/transform';
 import { createConfirmationUrl, createForgotPasswordUrl, sendEmail } from '@utils/email';
 import { createAccessToken, createRefreshToken, sendRefreshToken } from '@utils/token';
-import { checkLoginValidity, checkRegisterValidity } from '@validators/auth.validator';
+import {
+  checkChangePasswordValidity,
+  checkConfirmAccountValidity,
+  checkForgotPasswordValidity,
+  checkLoginValidity,
+  checkRegisterValidity,
+} from '@validators/auth.validator';
 import { compare, hash } from 'bcryptjs';
 import { Response } from 'express';
 import { Inject, Service } from 'typedi';
@@ -18,6 +24,9 @@ class AuthService {
   constructor(@Inject('ACCOUNT') private readonly accounts: IAccountModel) {}
 
   async changePassword({ token, password }: ChangePasswordInput): Promise<AccountResponse> {
+    const errors = checkChangePasswordValidity({ token, password });
+    if (errors) return errors;
+
     const accountId = await redis.get(forgotPasswordPrefix + token);
     if (!accountId)
       return {
@@ -46,6 +55,9 @@ class AuthService {
   }
 
   async confirmAccount(token: string): Promise<BooleanResponse> {
+    const errors = checkConfirmAccountValidity(token);
+    if (errors) return errors;
+
     const accountId = await redis.get(confirmAccountPrefix + token);
     if (!accountId)
       return {
@@ -64,6 +76,9 @@ class AuthService {
   }
 
   async forgotPassword(accountEmail: string): Promise<BooleanResponse> {
+    const errors = checkForgotPasswordValidity(accountEmail);
+    if (errors) return errors;
+
     const account: IAccount = await this.accounts.findOne({ email: accountEmail });
     if (!account)
       return {
@@ -80,7 +95,8 @@ class AuthService {
   }
 
   async login({ email, password }: LoginInput, res: Response): Promise<LoginResponse> {
-    checkLoginValidity({ email, password });
+    const errors = checkLoginValidity({ email, password });
+    if (errors) return errors;
 
     const account = await this.accounts.findOne({ email });
     if (!account)

@@ -8,7 +8,7 @@ const emailRegex: CustomRegex = {
 
 const passwordRegex: CustomRegex = {
   errorMessage:
-    'Password must contain a minimum of eight characters, and at least one uppercase letter, one lowercase letter and one number and one special character',
+    'Password must contain a minimum of eight characters, and at least one uppercase letter, one lowercase letter, one number and one special character',
   regex: new RegExp(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}$/),
 };
 

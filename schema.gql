@@ -79,6 +79,9 @@ type Query {
   accountById(accountId: String): AccountResponse
   accounts: AccountsResponse
   currentAccount: AccountResponse
+  hello: String
+  userByID(userId: String): UserResponse
+  users: UserResponse
 }
 
 """Register input"""
@@ -98,4 +101,10 @@ type User {
   lastname: String
   name: String
   updatedAt: String
+}
+
+"""User response"""
+type UserResponse {
+  errors: [FieldError!]
+  response: User
 }
