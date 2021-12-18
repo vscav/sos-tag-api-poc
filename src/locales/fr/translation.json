@@ -1,0 +1,37 @@
+{
+  "auth": {
+    "account_already_exist": "Un compte associé à {{email}} existe déjà",
+    "accont_confirmation_expired": "Le lien de confirmation du compte a expiré. Un nouveau mail doit être envoyé pour pouvoir confirmer le compte.",
+    "account_does_not_exist": "Ce compte n'existe pas",
+    "incorrect_password": "Le mot de passe est incorrect",
+    "password_modification_expired": "Le lien de modification du mot de passe a expiré. Un nouveau mail doit être envoyé pour pouvoir changer le mot de passe de son compte.",
+    "unvalidated_account": "Le compte doit être validé en suivant le lien envoyé à {{email}}"
+  },
+  "email": {
+    "confirm_account": "Confirmez votre compte",
+    "change_password": "Changez votre mot de passe"
+  },
+  "error": {
+    "invalid_email": "L'email doit être un email valide",
+    "invalid_password": "Le mot de passe doit contenir au minimum 8 caractères, dont au moins une majuscule, une minuscule, un chiffre et un caractère spécial",
+    "invalid_phone": "Le numéro de téléphone doit être un numéro français et valide",
+    "empty_input": "{{what}} est requis"
+  },
+  "greetings": {
+    "welcome": "Bienvenue sur {{what}}"
+  },
+  "input": {
+    "firstname": "prénom",
+    "lastname": "nom de famille",
+    "email": "email",
+    "phone": "numéro de téléphone",
+    "password": "mot de passe",
+    "token": "token",
+    "firstname_with_article": "le prénom",
+    "lastname_with_article": "le nom de famille",
+    "email_with_article": "l'email",
+    "phone_with_article": "le numéro de téléphone",
+    "password_with_article": "le mot de passe",
+    "token_with_article": "le token"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "auth": {
+    "account_already_exist": "An account associated to {{email}} already exists",
+    "accont_confirmation_expired": "Account confirmation link has expired. A new email needs to be sent to confirm this account.",
+    "account_does_not_exist": "This account does not exist",
+    "incorrect_password": "Password is incorrect",
+    "password_modification_expired": "Password modification link has expired. A new email needs to be sent to change this account password.",
+    "unvalidated_account": "Account must be validated by clicking the link sent to {{email}}"
+  },
+  "email": {
+    "confirm_account": "Confirm your acccount",
+    "change_password": "Change your password"
+  },
+  "error": {
+    "unvalid_email": "Email must be a valid one",
+    "unvalid_password": "Password must contain a minimum of eight characters, and at least one uppercase letter, one lowercase letter, one number and one special character",
+    "unvalid_phone": "Phone must be a valid french phone number",
+    "empty_input": "{{what}} is required"
+  },
+  "greetings": {
+    "welcome": "Welcome on {{what}}"
+  },
+  "input": {
+    "firstname": "firstname",
+    "lastname": "lastname",
+    "email": "email",
+    "phone": "phone",
+    "password": "password",
+    "token": "token",
+    "firstname_with_article": "the firstname",
+    "lastname_with_article": "the lastname",
+    "email_with_article": "the email",
+    "phone_with_article": "the phone",
+    "password_with_article": "the password",
+    "token_with_article": "the token"
+  }
+}

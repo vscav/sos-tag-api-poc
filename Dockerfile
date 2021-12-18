@@ -1,25 +1,20 @@
-# common build stage
-FROM node:14 as common-build-stage
-
-COPY . ./app
-COPY .env.production .env
+FROM node:14
 
 WORKDIR /app
 
-RUN yarn install
+COPY package.json ./
+COPY yarn.lock ./
 
-EXPOSE 8080
+RUN yarn
 
-# development build stage
-FROM common-build-stage as development-build-stage
+COPY . .
+COPY .env.production .env
 
-ENV NODE_ENV development
-
-CMD ["yarn", "dev"]
-
-# production build stage
-FROM common-build-stage as production-build-stage
+RUN yarn build
 
 ENV NODE_ENV production
 
+EXPOSE 8080
+
+ENV NODE_ENV production
 CMD ["yarn", "start"]

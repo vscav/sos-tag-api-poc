@@ -26,6 +26,9 @@ import { Container } from 'typedi';
 import { refreshToken } from 'utils/token';
 import UserModel from '@models/user.model';
 import { __prod__ } from '@constants/env';
+import i18next from 'i18next';
+import Backend from 'i18next-fs-backend';
+import middleware from 'i18next-http-middleware';
 
 Container.set({ id: 'ACCOUNT', factory: () => AccountModel });
 Container.set({ id: 'USER', factory: () => UserModel });
@@ -48,7 +51,7 @@ const start = async () => {
   const app = express();
 
   // If we are not in production mode, we able debug mode on mongoose
-  if (env !== 'production') {
+  if (!__prod__) {
     set('debug', true);
   }
 
@@ -61,7 +64,20 @@ const start = async () => {
   }
   logger.info('[mongoose:connect] The connection with the database has been established successfully.');
 
+  // Tell express that we will have a proxy (Nginx) in front of ur api
   app.set('proxy', 1);
+
+  // Initialize i18
+  i18next
+    .use(Backend)
+    .use(middleware.LanguageDetector)
+    .init({
+      fallbackLng: 'en',
+      backend: {
+        loadPath: `${__dirname}/locales/{{lng}}/translation.json`,
+      },
+      // debug: !__prod__,
+    });
 
   // Apply middlewares
   __prod__ && app.use(morgan(config.get('log.format'), { stream }));
@@ -69,13 +85,11 @@ const start = async () => {
   app.use(cookieParser());
   app.use(hpp());
   app.use(helmet({ contentSecurityPolicy: __prod__ ? undefined : false }));
-  // app.use(helmet({ contentSecurityPolicy: __prod__ ? false : false }));
   app.use(compression());
+  app.use(middleware.handle(i18next));
 
   // Define routes
-  // Helper text in development
-  env === 'development' &&
-    app.get('/', (_, res) => res.send(`Go to http://localhost:${port}/graphql to test SOS-Tag api requests in apollo playground`));
+  app.get('/', (_, res) => res.send(`SOS-Tag API (alpha version)`));
   // Create a route only dedicated to handle the refresh tokens
   app.post('/refresh_token', (req, res) => refreshToken(req, res));
 

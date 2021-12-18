@@ -26,18 +26,18 @@ class AuthResolver {
   constructor(private readonly authService: AuthService) {}
 
   @Query(() => String)
-  async hello(): Promise<string> {
+  async welcome(@Ctx() { req }: Context): Promise<string> {
     try {
-      return 'hello with docker';
+      return req.t('greetings.welcome', { what: 'SOS-Tag API (alpha version)' });
     } catch (error) {
       throw error;
     }
   }
 
   @Mutation(() => AccountSchema)
-  async changePassword(@Arg('changePasswordInput') changePasswordInput: ChangePasswordInput): Promise<AccountResponse> {
+  async changePassword(@Arg('changePasswordInput') changePasswordInput: ChangePasswordInput, @Ctx() { req }: Context): Promise<AccountResponse> {
     try {
-      const changePasswordResponse = await this.authService.changePassword(changePasswordInput);
+      const changePasswordResponse = await this.authService.changePassword(changePasswordInput, req);
       return changePasswordResponse;
     } catch (error) {
       logger.error(`[resolver:Auth:changePassword] ${error.message}`);
@@ -46,9 +46,9 @@ class AuthResolver {
   }
 
   @Mutation(() => BooleanResponse)
-  async confirmAccount(@Arg('token') token: string): Promise<BooleanResponse> {
+  async confirmAccount(@Arg('token') token: string, @Ctx() { req }: Context): Promise<BooleanResponse> {
     try {
-      const confirmationResponse = await this.authService.confirmAccount(token);
+      const confirmationResponse = await this.authService.confirmAccount(token, req);
       return confirmationResponse;
     } catch (error) {
       logger.error(`[resolver:Auth:confirmAccount] ${error.message}`);
@@ -57,9 +57,9 @@ class AuthResolver {
   }
 
   @Mutation(() => BooleanResponse)
-  async forgotPassword(@Arg('accountEmail') accountEmail: string): Promise<BooleanResponse> {
+  async forgotPassword(@Arg('accountEmail') accountEmail: string, @Ctx() { req }: Context): Promise<BooleanResponse> {
     try {
-      const forgotPasswordResponse = await this.authService.forgotPassword(accountEmail);
+      const forgotPasswordResponse = await this.authService.forgotPassword(accountEmail, req);
       return forgotPasswordResponse;
     } catch (error) {
       logger.error(`[resolver:Auth:forgotPassword] ${error.message}`);
@@ -68,9 +68,9 @@ class AuthResolver {
   }
 
   @Mutation(() => LoginResponse)
-  async login(@Arg('loginInput') loginInput: LoginInput, @Ctx() { res }: Context): Promise<LoginResponse> {
+  async login(@Arg('loginInput') loginInput: LoginInput, @Ctx() { req, res }: Context): Promise<LoginResponse> {
     try {
-      const loginResponse: LoginResponse = await this.authService.login(loginInput, res);
+      const loginResponse: LoginResponse = await this.authService.login(loginInput, req, res);
       return loginResponse;
     } catch (error) {
       logger.error(`[resolver:Auth:login] ${error.message}`);
@@ -90,9 +90,9 @@ class AuthResolver {
   }
 
   @Mutation(() => AccountResponse)
-  async register(@Arg('registerInput') registerInput: RegisterInput): Promise<AccountResponse> {
+  async register(@Arg('registerInput') registerInput: RegisterInput, @Ctx() { req }: Context): Promise<AccountResponse> {
     try {
-      const registerResponse = await this.authService.register(registerInput);
+      const registerResponse = await this.authService.register(registerInput, req);
       return registerResponse;
     } catch (error) {
       logger.error(`[resolver:Auth:register] ${error.message}`);

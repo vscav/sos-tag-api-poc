@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "yarn build && cross-env NODE_ENV=production node -r ts-node/register/transpile-only -r tsconfig-paths/register dist/src/app.js",
+    "start": "yarn build && cross-env NODE_ENV=production node -r ts-node/register/transpile-only -r tsconfig-paths/register dist/app.js",
     "dev": "cross-env NODE_ENV=development nodemon",
     "build": "tsc && npx tsc-alias",
     "lint": "eslint --ignore-path .gitignore --ext .ts src/",
@@ -26,6 +26,9 @@
     "graphql": "^15.3.0",
     "helmet": "^4.6.0",
     "hpp": "^0.2.3",
+    "i18next": "^21.6.0",
+    "i18next-fs-backend": "^1.1.4",
+    "i18next-http-middleware": "^3.1.4",
     "ioredis": "^4.28.2",
     "jest": "^27.4.2",
     "jsonwebtoken": "^8.5.1",

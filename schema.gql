@@ -79,9 +79,9 @@ type Query {
   accountById(accountId: String): AccountResponse
   accounts: AccountsResponse
   currentAccount: AccountResponse
-  hello: String
   userByID(userId: String): UserResponse
   users: UserResponse
+  welcome: String
 }
 
 """Register input"""

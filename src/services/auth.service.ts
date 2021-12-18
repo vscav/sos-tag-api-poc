@@ -15,7 +15,7 @@ import {
   checkRegisterValidity,
 } from '@validators/auth.validator';
 import { compare, hash } from 'bcryptjs';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { Inject, Service } from 'typedi';
 import { redis } from '../redis';
 
@@ -23,8 +23,8 @@ import { redis } from '../redis';
 class AuthService {
   constructor(@Inject('ACCOUNT') private readonly accounts: IAccountModel) {}
 
-  async changePassword({ token, password }: ChangePasswordInput): Promise<AccountResponse> {
-    const errors = checkChangePasswordValidity({ token, password });
+  async changePassword({ token, password }: ChangePasswordInput, req: Request): Promise<AccountResponse> {
+    const errors = checkChangePasswordValidity({ token, password }, req);
     if (errors) return errors;
 
     const accountId = await redis.get(forgotPasswordPrefix + token);
@@ -32,7 +32,7 @@ class AuthService {
       return {
         errors: [
           {
-            message: 'Password modification process has expired. Resend a new email to change this account password.',
+            message: req.t('auth.password_modification_expired'),
           },
         ],
       };
@@ -42,7 +42,7 @@ class AuthService {
       return {
         errors: [
           {
-            message: 'Account not found.',
+            message: req.t('auth.account_does_not_exist'),
           },
         ],
       };
@@ -54,8 +54,8 @@ class AuthService {
     return { response: transformAccount(await account.save()) };
   }
 
-  async confirmAccount(token: string): Promise<BooleanResponse> {
-    const errors = checkConfirmAccountValidity(token);
+  async confirmAccount(token: string, req: Request): Promise<BooleanResponse> {
+    const errors = checkConfirmAccountValidity(token, req);
     if (errors) return errors;
 
     const accountId = await redis.get(confirmAccountPrefix + token);
@@ -63,7 +63,7 @@ class AuthService {
       return {
         errors: [
           {
-            message: 'Confirmation process has expired. Resend a new confirmation email.',
+            message: req.t('auth.accont_confirmation_expired'),
           },
         ],
       };
@@ -75,8 +75,8 @@ class AuthService {
     return { response: true };
   }
 
-  async forgotPassword(accountEmail: string): Promise<BooleanResponse> {
-    const errors = checkForgotPasswordValidity(accountEmail);
+  async forgotPassword(accountEmail: string, req: Request): Promise<BooleanResponse> {
+    const errors = checkForgotPasswordValidity(accountEmail, req);
     if (errors) return errors;
 
     const account: IAccount = await this.accounts.findOne({ email: accountEmail });
@@ -84,18 +84,18 @@ class AuthService {
       return {
         errors: [
           {
-            message: 'Account not found.',
+            message: req.t('auth.account_does_not_exist'),
           },
         ],
       };
 
-    await sendEmail(accountEmail, 'Change your account password', await createForgotPasswordUrl(account.id));
+    await sendEmail(accountEmail, req.t('email.change_password'), await createForgotPasswordUrl(account.id));
 
     return { response: true };
   }
 
-  async login({ email, password }: LoginInput, res: Response): Promise<LoginResponse> {
-    const errors = checkLoginValidity({ email, password });
+  async login({ email, password }: LoginInput, req: Request, res: Response): Promise<LoginResponse> {
+    const errors = checkLoginValidity({ email, password }, req);
     if (errors) return errors;
 
     const account = await this.accounts.findOne({ email });
@@ -103,7 +103,7 @@ class AuthService {
       return {
         errors: [
           {
-            message: 'Account does not exist.',
+            message: req.t('auth.account_does_not_exist'),
           },
         ],
       };
@@ -113,7 +113,7 @@ class AuthService {
       return {
         errors: [
           {
-            message: 'Password is incorrect.',
+            message: req.t('auth.incorrect_password'),
           },
         ],
       };
@@ -122,7 +122,7 @@ class AuthService {
       return {
         errors: [
           {
-            message: 'Account must be validated.',
+            message: req.t('auth.unvalidated_account', { email }),
           },
         ],
       };
@@ -145,8 +145,8 @@ class AuthService {
     return { response: true };
   }
 
-  async register({ firstname, lastname, email, phone, password }: RegisterInput): Promise<AccountResponse> {
-    const errors = checkRegisterValidity({ firstname, lastname, email, phone, password });
+  async register({ firstname, lastname, email, phone, password }: RegisterInput, req: Request): Promise<AccountResponse> {
+    const errors = checkRegisterValidity({ firstname, lastname, email, phone, password }, req);
     if (errors) return errors;
 
     const accountFound = await this.accounts.findOne({ email });
@@ -154,7 +154,7 @@ class AuthService {
       return {
         errors: [
           {
-            message: 'Account already exists.',
+            message: req.t('auth.account_already_exist', { email }),
           },
         ],
       };
@@ -169,7 +169,7 @@ class AuthService {
       password: hashedPassword,
     });
 
-    await sendEmail(email, 'Confirm your account', await createConfirmationUrl(account.id));
+    await sendEmail(email, req.t('email.confirm_account'), await createConfirmationUrl(account.id));
 
     return { response: transformAccount(await account.save()) };
   }
