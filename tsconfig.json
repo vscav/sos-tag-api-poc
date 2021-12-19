@@ -1,9 +1,14 @@
 {
+  "ts-node": {
+    "moduleTypes": {
+      "jest.config.ts": "cjs"
+    }
+  },
   "compileOnSave": false,
   "compilerOptions": {
-    "target": "es2017",
-    "lib": ["es2017", "esnext.asynciterable"],
-    "types": ["node"],
+    "target": "es2020",
+    "lib": ["es2020", "esnext.asynciterable"],
+    "types": ["node", "jest"],
     "typeRoots": ["@types", "node_modules/@types"],
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
@@ -36,7 +41,7 @@
       "@schemas/*": ["schemas/*"],
       "@services/*": ["services/*"],
       "@utils/*": ["utils/*"],
-      "@validators/*": ["validators/*"],
+      "@validators/*": ["validators/*"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.json", ".env"],

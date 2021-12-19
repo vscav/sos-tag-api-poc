@@ -67,7 +67,7 @@ type LoginResponseData {
 }
 
 type Mutation {
-  changePassword(changePasswordInput: ChangePasswordInput): Account
+  changePassword(changePasswordInput: ChangePasswordInput): AccountResponse
   confirmAccount(token: String): BooleanResponse
   forgotPassword(accountEmail: String): BooleanResponse
   login(loginInput: LoginInput): LoginResponse

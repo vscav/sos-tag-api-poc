@@ -34,7 +34,7 @@ class AuthResolver {
     }
   }
 
-  @Mutation(() => AccountSchema)
+  @Mutation(() => AccountResponse)
   async changePassword(@Arg('changePasswordInput') changePasswordInput: ChangePasswordInput, @Ctx() { req }: Context): Promise<AccountResponse> {
     try {
       const changePasswordResponse = await this.authService.changePassword(changePasswordInput, req);

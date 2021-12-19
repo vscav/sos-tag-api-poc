@@ -11,5 +11,8 @@ node_modules
 .lintstagedrc.json
 .prettierrc
 
+# test
+jest.config.js
+
 # docker
 Dockerfile
