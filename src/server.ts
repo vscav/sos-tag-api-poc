@@ -104,7 +104,7 @@ class Server {
   }
 
   private initializeRoutes() {
-    this.express.get('/', (_, res) => res.send(`SOS-Tag API (alpha version)`));
+    this.express.get('/', (_, res) => res.send(`SOS-Tag API (alpha version - 1.0)`));
     this.express.post('/refresh_token', (req, res) => refreshToken(req, res));
   }
 
