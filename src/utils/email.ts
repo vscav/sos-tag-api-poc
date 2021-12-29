@@ -31,11 +31,11 @@ const createForgotPasswordUrl = async (accountId: string) => {
 
 const generateEmailHTMLTemplate = (type: EmailAim, name: string, url: string, req: Request) => {
   return `<div style="margin: 0 auto; font-family: Helvetica, sans-serif; color: #333333; text-align: center; max-width: 520px; padding: 0 20px">
-  <div style="text-align: center; padding: 50px 0">
+  <!--<div style="text-align: center; padding: 50px 0">
     <a rel="noopener noreferrer" href="http://localhost:3000">
       <img alt="SOS-Tag" width="100px" src="cid:sos-tag-logo">
     </a>
-  </div>
+  </div>-->
   <div style="font-size: 16px; text-align: left">
     <div style="line-height: 150%">
       <div style="font-size: 20px">${req.t(`email.${type}.greetings`, { name })},</div>
@@ -79,13 +79,13 @@ const sendEmail = async (type: EmailAim, name: string, email: string, url: strin
     // to: 'dofel82126@saturdata.com',
     subject: `[SOS-Tag] ${req.t(`email.${type}.subject`)}`,
     html: generateEmailHTMLTemplate(type, name, url, req),
-    attachments: [
-      {
-        filename: 'sos-tag-logo.png',
-        path: `${__dirname}/../assets/images/sos-tag-logo.png`,
-        cid: 'sos-tag-logo',
-      },
-    ],
+    // attachments: [
+    //   {
+    //     filename: 'sos-tag-logo.png',
+    //     path: `${__dirname}/../assets/images/sos-tag-logo.png`,
+    //     cid: 'sos-tag-logo',
+    //   },
+    // ],
   };
 
   const info = await transporter.sendMail(mailOptions);
