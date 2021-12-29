@@ -8,8 +8,20 @@
     "unvalidated_account": "Le compte doit être validé en suivant le lien envoyé à {{email}}"
   },
   "email": {
-    "confirm_account": "Confirmez votre compte",
-    "change_password": "Changez votre mot de passe"
+    "confirm_account": {
+      "subject": "Confirmez votre adresse email",
+      "greetings": "Bonjour {{name}}",
+      "body": "Merci d'avoir créé un compte. Veuillez vérifier votre adresse email en cliquant sur le bouton ci-dessous.",
+      "link": "Vérifier l'adresse email",
+      "footer": "L'équipe de SOS-Tag"
+    },
+    "change_password": {
+      "subject": "Changement de mot de passe",
+      "greetings": "Bonjour {{name}}",
+      "body": "Afin de procéder au changement de votre mot de passe, merci de suivre le lien en cliquant sur le bouton ci-dessous.",
+      "link": "Changer de mot de passe",
+      "footer": "L'équipe de SOS-Tag"
+    }
   },
   "error": {
     "invalid_email": "L'email doit être un email valide",

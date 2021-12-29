@@ -6,6 +6,7 @@ import { LoginResponse } from '@resolvers/auth.resolver';
 import { BooleanResponse } from '@responses';
 import { transformAccount } from '@services/utils/transform';
 import { createConfirmationUrl, createForgotPasswordUrl, sendEmail } from '@utils/email';
+import { formatObject } from '@utils/format';
 import { createAccessToken, createRefreshToken, sendRefreshToken } from '@utils/token';
 import {
   checkChangePasswordValidity,
@@ -89,14 +90,17 @@ class AuthService {
         ],
       };
 
-    await sendEmail(accountEmail, req.t('email.change_password'), await createForgotPasswordUrl(account.id));
+    await sendEmail('change_password', account.firstname, accountEmail, await createForgotPasswordUrl(account.id), req);
 
     return { response: true };
   }
 
-  async login({ email, password }: LoginInput, req: Request, res: Response): Promise<LoginResponse> {
-    const errors = checkLoginValidity({ email, password }, req);
+  async login(loginInput: LoginInput, req: Request, res: Response): Promise<LoginResponse> {
+    const errors = checkLoginValidity(loginInput, req);
     if (errors) return errors;
+
+    const formattedLoginInput = formatObject(loginInput) as LoginInput;
+    const { email, password } = formattedLoginInput;
 
     const account = await this.accounts.findOne({ email });
     if (!account)
@@ -145,9 +149,12 @@ class AuthService {
     return { response: true };
   }
 
-  async register({ firstname, lastname, email, phone, password }: RegisterInput, req: Request): Promise<AccountResponse> {
-    const errors = checkRegisterValidity({ firstname, lastname, email, phone, password }, req);
+  async register(registerInput: RegisterInput, req: Request): Promise<AccountResponse> {
+    const errors = checkRegisterValidity(registerInput, req);
     if (errors) return errors;
+
+    const formattedRegisterInput = formatObject(registerInput) as RegisterInput;
+    const { firstname, lastname, email, phone, password } = formattedRegisterInput;
 
     const accountFound = await this.accounts.findOne({ email });
     if (accountFound)
@@ -169,7 +176,7 @@ class AuthService {
       password: hashedPassword,
     });
 
-    await sendEmail(email, req.t('email.confirm_account'), await createConfirmationUrl(account.id));
+    await sendEmail('confirm_account', firstname, email, await createConfirmationUrl(account.id), req);
 
     return { response: transformAccount(await account.save()) };
   }

@@ -1,11 +1,11 @@
 process.env['NODE_CONFIG_DIR'] = __dirname + '/configs';
 
-import 'dotenv/config';
+import Server from '@/server';
 import AccountModel from '@models/account.model';
 import UserModel from '@models/user.model';
 import validateEnv from '@utils/validate-env';
+import 'dotenv/config';
 import { Container } from 'typedi';
-import Server from '@/server';
 
 validateEnv();
 
