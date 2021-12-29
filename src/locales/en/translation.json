@@ -8,7 +8,7 @@
     "unvalidated_account": "Account must be validated by clicking the link sent to {{email}}"
   },
   "email": {
-    "confirm_account": {
+    "confirm_user": {
       "subject": "Confirm your email address",
       "greetings": "Hi {{name}}",
       "body": "Thanks for creating an account. Please verify your email address by clicking on the button below.",

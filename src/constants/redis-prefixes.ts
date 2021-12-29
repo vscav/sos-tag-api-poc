@@ -1,4 +1,4 @@
-const confirmAccountPrefix = 'user-confirmation:';
+const confirmUserPrefix = 'user-confirmation:';
 const forgotPasswordPrefix = 'forgot-password:';
 
-export { confirmAccountPrefix, forgotPasswordPrefix };
+export { confirmUserPrefix, forgotPasswordPrefix };

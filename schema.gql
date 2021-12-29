@@ -15,19 +15,6 @@ type Account {
   phone: String
   tokenVersion: Int
   updatedAt: String
-  users: [User]
-}
-
-"""Account response"""
-type AccountResponse {
-  errors: [FieldError!]
-  response: Account
-}
-
-"""Accounts response"""
-type AccountsResponse {
-  errors: [FieldError!]
-  response: [Account!]
 }
 
 """Boolean response"""
@@ -63,24 +50,22 @@ type LoginResponse {
 """Login response data"""
 type LoginResponseData {
   accessToken: String
-  account: Account
+  user: Account
 }
 
 type Mutation {
-  changePassword(changePasswordInput: ChangePasswordInput): AccountResponse
-  confirmAccount(token: String): BooleanResponse
-  forgotPassword(accountEmail: String): BooleanResponse
+  changePassword(changePasswordInput: ChangePasswordInput): UserResponse
+  confirmUser(token: String): BooleanResponse
+  forgotPassword(userEmail: String): BooleanResponse
   login(loginInput: LoginInput): LoginResponse
   logout: BooleanResponse
-  register(registerInput: RegisterInput): AccountResponse
+  register(registerInput: RegisterInput): UserResponse
 }
 
 type Query {
-  accountById(accountId: String): AccountResponse
-  accounts: AccountsResponse
-  currentAccount: AccountResponse
-  userByID(userId: String): UserResponse
-  users: UserResponse
+  currentUser: UserResponse
+  userById(userId: String): UserResponse
+  users: UsersResponse
   welcome: String
 }
 
@@ -93,18 +78,14 @@ input RegisterInput {
   phone: String
 }
 
-"""User Schema"""
-type User {
-  _id: ID
-  createdAt: String
-  firstname: String
-  lastname: String
-  name: String
-  updatedAt: String
-}
-
 """User response"""
 type UserResponse {
   errors: [FieldError!]
-  response: User
+  response: Account
+}
+
+"""Users response"""
+type UsersResponse {
+  errors: [FieldError!]
+  response: [Account!]
 }

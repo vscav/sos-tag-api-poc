@@ -1,18 +1,18 @@
 import { ChangePasswordInput, LoginInput, RegisterInput } from '@dtos/auth.dto';
 import Context from '@interfaces/context.interface';
-import { IAccount } from '@models/account.model';
-import AccountSchema from '@schemas/account.schema';
+import { IUser } from 'models/user.model';
+import UserSchema from '@schemas/user.schema';
 import AuthService from '@services/auth.service';
 import { logger } from '@utils/logger';
 import { Arg, Ctx, Field, Mutation, ObjectType, Query, Resolver } from 'type-graphql';
 import { Service } from 'typedi';
 import { BooleanResponse, SingleObjectResponse } from '@responses';
-import { AccountResponse } from './account.resolver';
+import { UserResponse } from './user.resolver';
 
 @ObjectType({ description: 'Login response data' })
 class LoginResponseData {
-  @Field(() => AccountSchema)
-  account: IAccount;
+  @Field(() => UserSchema)
+  user: IUser;
   @Field(() => String)
   accessToken: string;
 }
@@ -21,7 +21,7 @@ class LoginResponseData {
 class LoginResponse extends SingleObjectResponse(LoginResponseData) {}
 
 @Service()
-@Resolver(() => AccountSchema)
+@Resolver(() => UserSchema)
 class AuthResolver {
   constructor(private readonly authService: AuthService) {}
 
@@ -34,8 +34,8 @@ class AuthResolver {
     }
   }
 
-  @Mutation(() => AccountResponse)
-  async changePassword(@Arg('changePasswordInput') changePasswordInput: ChangePasswordInput, @Ctx() { req }: Context): Promise<AccountResponse> {
+  @Mutation(() => UserResponse)
+  async changePassword(@Arg('changePasswordInput') changePasswordInput: ChangePasswordInput, @Ctx() { req }: Context): Promise<UserResponse> {
     try {
       const changePasswordResponse = await this.authService.changePassword(changePasswordInput, req);
       return changePasswordResponse;
@@ -46,20 +46,20 @@ class AuthResolver {
   }
 
   @Mutation(() => BooleanResponse)
-  async confirmAccount(@Arg('token') token: string, @Ctx() { req }: Context): Promise<BooleanResponse> {
+  async confirmUser(@Arg('token') token: string, @Ctx() { req }: Context): Promise<BooleanResponse> {
     try {
-      const confirmationResponse = await this.authService.confirmAccount(token, req);
+      const confirmationResponse = await this.authService.confirmUser(token, req);
       return confirmationResponse;
     } catch (error) {
-      logger.error(`[resolver:Auth:confirmAccount] ${error.message}`);
+      logger.error(`[resolver:Auth:confirmUser] ${error.message}`);
       throw error;
     }
   }
 
   @Mutation(() => BooleanResponse)
-  async forgotPassword(@Arg('accountEmail') accountEmail: string, @Ctx() { req }: Context): Promise<BooleanResponse> {
+  async forgotPassword(@Arg('userEmail') userEmail: string, @Ctx() { req }: Context): Promise<BooleanResponse> {
     try {
-      const forgotPasswordResponse = await this.authService.forgotPassword(accountEmail, req);
+      const forgotPasswordResponse = await this.authService.forgotPassword(userEmail, req);
       return forgotPasswordResponse;
     } catch (error) {
       logger.error(`[resolver:Auth:forgotPassword] ${error.message}`);
@@ -89,8 +89,8 @@ class AuthResolver {
     }
   }
 
-  @Mutation(() => AccountResponse)
-  async register(@Arg('registerInput') registerInput: RegisterInput, @Ctx() { req }: Context): Promise<AccountResponse> {
+  @Mutation(() => UserResponse)
+  async register(@Arg('registerInput') registerInput: RegisterInput, @Ctx() { req }: Context): Promise<UserResponse> {
     try {
       const registerResponse = await this.authService.register(registerInput, req);
       return registerResponse;

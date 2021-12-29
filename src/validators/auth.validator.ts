@@ -14,7 +14,7 @@ const checkChangePasswordValidity = (changePasswordInput: ChangePasswordInput, r
   if (!isEmpty(invalidArgs)) return generateFieldErrors(invalidArgs);
 };
 
-const checkConfirmAccountValidity = (token: string, req: Request) => {
+const checkConfirmUserValidity = (token: string, req: Request) => {
   const emptyArgs = emptyArgsExist({ token }, req);
   if (!isEmpty(emptyArgs)) return generateFieldErrors(emptyArgs);
 };
@@ -39,4 +39,4 @@ const checkRegisterValidity = (registerInput: RegisterInput, req: Request) => {
   if (!isEmpty(invalidArgs)) return generateFieldErrors(invalidArgs);
 };
 
-export { checkChangePasswordValidity, checkConfirmAccountValidity, checkForgotPasswordValidity, checkLoginValidity, checkRegisterValidity };
+export { checkChangePasswordValidity, checkConfirmUserValidity, checkForgotPasswordValidity, checkLoginValidity, checkRegisterValidity };

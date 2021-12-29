@@ -1,10 +1,14 @@
+import Context from '@interfaces/context.interface';
 import { isAuth } from '@middlewares/is-auth.middleware';
+import { ObjectsResponse, SingleObjectResponse } from '@responses';
 import UserSchema from '@schemas/user.schema';
 import UserService from '@services/user.service';
 import { logger } from '@utils/logger';
-import { Arg, ObjectType, Query, Resolver, UseMiddleware } from 'type-graphql';
+import { verify } from 'jsonwebtoken';
+import { Arg, Ctx, ObjectType, Query, Resolver, UseMiddleware } from 'type-graphql';
 import { Service } from 'typedi';
-import { ObjectsResponse, SingleObjectResponse } from '@responses';
+
+const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
 
 @ObjectType({ description: 'User response' })
 class UserResponse extends SingleObjectResponse(UserSchema) {}
@@ -18,8 +22,26 @@ class UserResolver {
   constructor(private readonly userService: UserService) {}
 
   @Query(() => UserResponse)
+  async currentUser(@Ctx() { req }: Context): Promise<UserResponse> {
+    const authorization = req.headers['authorization'];
+    if (!authorization) {
+      return null;
+    }
+
+    try {
+      const token = authorization.split(' ')[1];
+      const payload: any = verify(token, accessTokenSecret);
+      const currentUser = await this.userById(payload.userId);
+      return currentUser;
+    } catch (error) {
+      logger.error(`[resolver:User:currentUser] ${error.message}.`);
+      return null;
+    }
+  }
+
+  @Query(() => UserResponse)
   @UseMiddleware(isAuth)
-  async userByID(@Arg('userId') userId: string): Promise<UserResponse> {
+  async userById(@Arg('userId') userId: string): Promise<UserResponse> {
     try {
       const user = await this.userService.findUserById(userId);
       return user;
@@ -29,9 +51,9 @@ class UserResolver {
     }
   }
 
-  @Query(() => UserResponse)
+  @Query(() => UsersResponse)
   @UseMiddleware(isAuth)
-  async users(): Promise<UserResponse> {
+  async users(): Promise<UsersResponse> {
     try {
       const users = await this.userService.findUsers();
       return users;

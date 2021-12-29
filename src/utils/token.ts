@@ -1,6 +1,6 @@
 import { ContextPayload } from '@interfaces/context.interface';
 import tokenConfig from '@interfaces/token.interface';
-import accountModel, { IAccount } from '@models/account.model';
+import accountModel, { IUser } from '@models/user.model';
 import config from 'config';
 import { Request, Response } from 'express';
 import { sign, verify } from 'jsonwebtoken';
@@ -11,7 +11,7 @@ const { duration: refreshTokenDuration }: tokenConfig = config.get('refreshToken
 const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
 const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET;
 
-const createAccessToken = (account: IAccount) => {
+const createAccessToken = (account: IUser) => {
   return sign(
     {
       accountId: account.id,
@@ -23,7 +23,7 @@ const createAccessToken = (account: IAccount) => {
   );
 };
 
-const createRefreshToken = (account: IAccount) => {
+const createRefreshToken = (account: IUser) => {
   return sign(
     {
       userId: account.id,
@@ -50,7 +50,7 @@ const refreshToken = async (req: Request, res: Response) => {
   }
 
   // Refresh token is valid and we can send back an access token
-  const account: IAccount = await accountModel.findOne({ _id: payload.accountId });
+  const account: IUser = await accountModel.findOne({ _id: payload.accountId });
 
   if (!account) {
     return res.send({ ok: false, accessToken: '' });

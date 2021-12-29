@@ -1,7 +1,7 @@
-import { Field, ID, ObjectType, Root } from 'type-graphql';
+import { Field, ID, Int, ObjectType } from 'type-graphql';
 
-@ObjectType({ description: 'User Schema' })
-class User {
+@ObjectType({ description: 'Account Schema' })
+class Account {
   @Field(() => ID)
   _id: String;
 
@@ -12,9 +12,19 @@ class User {
   lastname: String;
 
   @Field()
-  name(@Root() parent: User): string {
-    return `${parent.firstname} ${parent.lastname}`;
-  }
+  email: String;
+
+  @Field()
+  phone: String;
+
+  @Field()
+  password: String;
+
+  @Field(() => Int, { defaultValue: 0 })
+  tokenVersion: Number;
+
+  @Field(() => Boolean, { defaultValue: false })
+  confirmed: boolean;
 
   @Field(() => String)
   createdAt: Date;
@@ -23,4 +33,4 @@ class User {
   updatedAt: Date;
 }
 
-export default User;
+export default Account;

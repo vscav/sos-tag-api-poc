@@ -1,6 +1,6 @@
 import { dateToString } from '@utils/date';
 
-const transformAccount = account => {
+const transformUser = account => {
   return {
     ...account._doc,
     _id: account.id,
@@ -12,13 +12,4 @@ const transformAccount = account => {
   };
 };
 
-const transformUser = user => {
-  return {
-    ...user._doc,
-    _id: user.id,
-    createdAt: dateToString(user.createdAt),
-    updatedAt: dateToString(user.updatedAt),
-  };
-};
-
-export { transformAccount, transformUser };
+export { transformUser };

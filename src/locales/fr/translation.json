@@ -8,7 +8,7 @@
     "unvalidated_account": "Le compte doit être validé en suivant le lien envoyé à {{email}}"
   },
   "email": {
-    "confirm_account": {
+    "confirm_user": {
       "subject": "Confirmez votre adresse email",
       "greetings": "Bonjour {{name}}",
       "body": "Merci d'avoir créé un compte. Veuillez vérifier votre adresse email en cliquant sur le bouton ci-dessous.",

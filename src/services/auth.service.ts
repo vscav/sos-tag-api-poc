@@ -1,16 +1,15 @@
-import { confirmAccountPrefix, forgotPasswordPrefix } from '@constants/redis-prefixes';
+import { confirmUserPrefix, forgotPasswordPrefix } from '@constants/redis-prefixes';
 import { ChangePasswordInput, LoginInput, RegisterInput } from '@dtos/auth.dto';
-import { IAccount, IAccountModel } from '@models/account.model';
-import { AccountResponse } from '@resolvers/account.resolver';
+import { IUser, IUserModel } from '@models/user.model';
+import { UserResponse } from '@resolvers/user.resolver';
 import { LoginResponse } from '@resolvers/auth.resolver';
 import { BooleanResponse } from '@responses';
-import { transformAccount } from '@services/utils/transform';
+import { transformUser } from '@services/utils/transform';
 import { createConfirmationUrl, createForgotPasswordUrl, sendEmail } from '@utils/email';
-import { formatObject } from '@utils/format';
 import { createAccessToken, createRefreshToken, sendRefreshToken } from '@utils/token';
 import {
   checkChangePasswordValidity,
-  checkConfirmAccountValidity,
+  checkConfirmUserValidity,
   checkForgotPasswordValidity,
   checkLoginValidity,
   checkRegisterValidity,
@@ -22,14 +21,14 @@ import { redis } from '../redis';
 
 @Service()
 class AuthService {
-  constructor(@Inject('ACCOUNT') private readonly accounts: IAccountModel) {}
+  constructor(@Inject('USER') private readonly users: IUserModel) {}
 
-  async changePassword({ token, password }: ChangePasswordInput, req: Request): Promise<AccountResponse> {
+  async changePassword({ token, password }: ChangePasswordInput, req: Request): Promise<UserResponse> {
     const errors = checkChangePasswordValidity({ token, password }, req);
     if (errors) return errors;
 
-    const accountId = await redis.get(forgotPasswordPrefix + token);
-    if (!accountId)
+    const userId = await redis.get(forgotPasswordPrefix + token);
+    if (!userId)
       return {
         errors: [
           {
@@ -38,29 +37,29 @@ class AuthService {
         ],
       };
 
-    const account: IAccount = await this.accounts.findOne({ _id: accountId });
-    if (!account)
+    const user: IUser = await this.users.findOne({ _id: userId });
+    if (!user)
       return {
         errors: [
           {
-            message: req.t('auth.account_does_not_exist'),
+            message: req.t('auth.user_does_not_exist'),
           },
         ],
       };
 
     await redis.del(forgotPasswordPrefix + token);
 
-    account.password = await hash(password, 12);
+    user.password = await hash(password, 12);
 
-    return { response: transformAccount(await account.save()) };
+    return { response: transformUser(await user.save()) };
   }
 
-  async confirmAccount(token: string, req: Request): Promise<BooleanResponse> {
-    const errors = checkConfirmAccountValidity(token, req);
+  async confirmUser(token: string, req: Request): Promise<BooleanResponse> {
+    const errors = checkConfirmUserValidity(token, req);
     if (errors) return errors;
 
-    const accountId = await redis.get(confirmAccountPrefix + token);
-    if (!accountId)
+    const userId = await redis.get(confirmUserPrefix + token);
+    if (!userId)
       return {
         errors: [
           {
@@ -69,50 +68,47 @@ class AuthService {
         ],
       };
 
-    await this.accounts.findOneAndUpdate({ _id: accountId }, { confirmed: true });
+    await this.users.findOneAndUpdate({ _id: userId }, { confirmed: true });
 
-    await redis.del(confirmAccountPrefix + token);
-
-    return { response: true };
-  }
-
-  async forgotPassword(accountEmail: string, req: Request): Promise<BooleanResponse> {
-    const errors = checkForgotPasswordValidity(accountEmail, req);
-    if (errors) return errors;
-
-    const account: IAccount = await this.accounts.findOne({ email: accountEmail });
-    if (!account)
-      return {
-        errors: [
-          {
-            message: req.t('auth.account_does_not_exist'),
-          },
-        ],
-      };
-
-    await sendEmail('change_password', account.firstname, accountEmail, await createForgotPasswordUrl(account.id), req);
+    await redis.del(confirmUserPrefix + token);
 
     return { response: true };
   }
 
-  async login(loginInput: LoginInput, req: Request, res: Response): Promise<LoginResponse> {
-    const errors = checkLoginValidity(loginInput, req);
+  async forgotPassword(userEmail: string, req: Request): Promise<BooleanResponse> {
+    const errors = checkForgotPasswordValidity(userEmail, req);
     if (errors) return errors;
 
-    const formattedLoginInput = formatObject(loginInput) as LoginInput;
-    const { email, password } = formattedLoginInput;
-
-    const account = await this.accounts.findOne({ email });
-    if (!account)
+    const user: IUser = await this.users.findOne({ email: userEmail });
+    if (!user)
       return {
         errors: [
           {
-            message: req.t('auth.account_does_not_exist'),
+            message: req.t('auth.user_does_not_exist'),
           },
         ],
       };
 
-    const valid = await compare(password, account.password);
+    await sendEmail('change_password', user.firstname, userEmail, await createForgotPasswordUrl(user.id), req);
+
+    return { response: true };
+  }
+
+  async login({ email, password }: LoginInput, req: Request, res: Response): Promise<LoginResponse> {
+    const errors = checkLoginValidity({ email, password }, req);
+    if (errors) return errors;
+
+    const user = await this.users.findOne({ email });
+    if (!user)
+      return {
+        errors: [
+          {
+            message: req.t('auth.user_does_not_exist'),
+          },
+        ],
+      };
+
+    const valid = await compare(password, user.password);
     if (!valid)
       return {
         errors: [
@@ -122,23 +118,23 @@ class AuthService {
         ],
       };
 
-    if (!account.confirmed)
+    if (!user.confirmed)
       return {
         errors: [
           {
-            message: req.t('auth.unvalidated_account', { email }),
+            message: req.t('auth.unvalidated_user', { email }),
           },
         ],
       };
 
-    const accessToken = createAccessToken(account);
-    const refreshToken = createRefreshToken(account);
+    const accessToken = createAccessToken(user);
+    const refreshToken = createRefreshToken(user);
 
     sendRefreshToken(res, refreshToken);
 
     return {
       response: {
-        account: transformAccount(account),
+        user: transformUser(user),
         accessToken: accessToken,
       },
     };
@@ -149,26 +145,23 @@ class AuthService {
     return { response: true };
   }
 
-  async register(registerInput: RegisterInput, req: Request): Promise<AccountResponse> {
-    const errors = checkRegisterValidity(registerInput, req);
+  async register({ firstname, lastname, email, phone, password }: RegisterInput, req: Request): Promise<UserResponse> {
+    const errors = checkRegisterValidity({ firstname, lastname, email, phone, password }, req);
     if (errors) return errors;
 
-    const formattedRegisterInput = formatObject(registerInput) as RegisterInput;
-    const { firstname, lastname, email, phone, password } = formattedRegisterInput;
-
-    const accountFound = await this.accounts.findOne({ email });
-    if (accountFound)
+    const userFound = await this.users.findOne({ email });
+    if (userFound)
       return {
         errors: [
           {
-            message: req.t('auth.account_already_exist', { email }),
+            message: req.t('auth.user_already_exist', { email }),
           },
         ],
       };
 
     const hashedPassword = await hash(password, 12);
 
-    const account = await this.accounts.create({
+    const user = await this.users.create({
       firstname,
       lastname,
       email,
@@ -176,9 +169,9 @@ class AuthService {
       password: hashedPassword,
     });
 
-    await sendEmail('confirm_account', firstname, email, await createConfirmationUrl(account.id), req);
+    await sendEmail('confirm_user', firstname, email, await createConfirmationUrl(user.id), req);
 
-    return { response: transformAccount(await account.save()) };
+    return { response: transformUser(await user.save()) };
   }
 }
 

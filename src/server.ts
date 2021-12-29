@@ -3,9 +3,8 @@ process.env['NODE_CONFIG_DIR'] = __dirname + '/configs';
 import 'reflect-metadata';
 
 import { __prod__ } from '@constants/env';
-import AccountResolver from '@resolvers/account.resolver';
+import AccountResolver from '@resolvers/user.resolver';
 import AuthResolver from '@resolvers/auth.resolver';
-import UserResolver from '@resolvers/user.resolver';
 import { logger, stream } from '@utils/logger';
 import { ApolloServer, ExpressContext } from 'apollo-server-express';
 import compression from 'compression';
@@ -57,7 +56,7 @@ class Server {
 
   private async buildGraphQLSchema() {
     this.schema = await buildSchema({
-      resolvers: [AccountResolver, AuthResolver, UserResolver],
+      resolvers: [AccountResolver, AuthResolver],
       emitSchemaFile: true,
       nullableByDefault: true,
       container: Container,
