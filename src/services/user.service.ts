@@ -1,13 +1,13 @@
 import { IUser, IUserModel } from '@models/user.model';
-import { UserResponse, UsersResponse } from '@resolvers/user.resolver';
-import { BooleanResponse } from '@responses';
+import { BooleanResponse } from '@responses/common.response';
+import { UserResponse, UsersResponse } from '@responses/user.response';
 import { transformUser } from '@services/utils/transform';
 import { isEmpty } from '@utils/object';
 import { Inject, Service } from 'typedi';
 
 @Service()
 class UserService {
-  constructor(@Inject('USER') private readonly accounts: IUserModel) {}
+  constructor(@Inject('USER') private readonly users: IUserModel) {}
 
   async findUserById(userId: string): Promise<UserResponse> {
     if (isEmpty(userId))
@@ -19,7 +19,7 @@ class UserService {
         ],
       };
 
-    const account: IUser = await this.accounts.findOne({ _id: userId });
+    const account: IUser = await this.users.findOne({ _id: userId });
     if (!account)
       return {
         errors: [
@@ -33,7 +33,7 @@ class UserService {
   }
 
   async findUsers(): Promise<UsersResponse> {
-    const accounts: IUser[] = await this.accounts.find();
+    const accounts: IUser[] = await this.users.find();
     return { response: accounts.map(account => transformUser(account)) };
   }
 
@@ -47,7 +47,7 @@ class UserService {
         ],
       };
 
-    const updatedUser = await this.accounts.findOneAndUpdate({ _id: userId }, { $inc: { tokenVersion: 1 } });
+    const updatedUser = await this.users.findOneAndUpdate({ _id: userId }, { $inc: { tokenVersion: 1 } });
     if (!updatedUser)
       return {
         errors: [

@@ -1,27 +1,21 @@
+import { UserResponse, UsersResponse } from '@responses/user.response';
 import Context from '@interfaces/context.interface';
 import { isAuth } from '@middlewares/is-auth.middleware';
-import { ObjectsResponse, SingleObjectResponse } from '@responses';
 import UserSchema from '@schemas/user.schema';
 import UserService from '@services/user.service';
 import { logger } from '@utils/logger';
 import { verify } from 'jsonwebtoken';
-import { Arg, Ctx, ObjectType, Query, Resolver, UseMiddleware } from 'type-graphql';
+import { Arg, Ctx, Query, Resolver, UseMiddleware } from 'type-graphql';
 import { Service } from 'typedi';
 
 const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
-
-@ObjectType({ description: 'User response' })
-class UserResponse extends SingleObjectResponse(UserSchema) {}
-
-@ObjectType({ description: 'Users response' })
-class UsersResponse extends ObjectsResponse(UserSchema) {}
 
 @Service()
 @Resolver(() => UserSchema)
 class UserResolver {
   constructor(private readonly userService: UserService) {}
 
-  @Query(() => UserResponse)
+  @Query(() => UserResponse, { description: 'Get the user currently logged in.' })
   async currentUser(@Ctx() { req }: Context): Promise<UserResponse> {
     const authorization = req.headers['authorization'];
     if (!authorization) {
@@ -39,7 +33,7 @@ class UserResolver {
     }
   }
 
-  @Query(() => UserResponse)
+  @Query(() => UserResponse, { description: 'Get a user by his id.' })
   @UseMiddleware(isAuth)
   async userById(@Arg('userId') userId: string): Promise<UserResponse> {
     try {
@@ -51,7 +45,7 @@ class UserResolver {
     }
   }
 
-  @Query(() => UsersResponse)
+  @Query(() => UsersResponse, { description: 'Get all users.' })
   @UseMiddleware(isAuth)
   async users(): Promise<UsersResponse> {
     try {
@@ -64,5 +58,4 @@ class UserResolver {
   }
 }
 
-export { UserResponse, UsersResponse };
 export default UserResolver;

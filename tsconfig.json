@@ -37,7 +37,7 @@
       "@middlewares/*": ["middlewares/*"],
       "@models/*": ["models/*"],
       "@resolvers/*": ["resolvers/*"],
-      "@responses": ["responses"],
+      "@responses/*": ["responses/*"],
       "@schemas/*": ["schemas/*"],
       "@services/*": ["services/*"],
       "@utils/*": ["utils/*"],

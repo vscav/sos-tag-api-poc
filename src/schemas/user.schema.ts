@@ -1,7 +1,7 @@
 import { Field, ID, Int, ObjectType } from 'type-graphql';
 
-@ObjectType({ description: 'Account Schema' })
-class Account {
+@ObjectType({ description: 'User Schema' })
+class User {
   @Field(() => ID)
   _id: String;
 
@@ -33,4 +33,4 @@ class Account {
   updatedAt: Date;
 }
 
-export default Account;
+export default User;

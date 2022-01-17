@@ -2,7 +2,7 @@ import { ExpressContext } from 'apollo-server-express';
 import { Request, Response } from 'express';
 
 interface ContextPayload {
-  accountId: string;
+  userId: string;
   tokenVersion: number;
 }
 

@@ -1,9 +1,9 @@
 import { confirmUserPrefix, forgotPasswordPrefix } from '@constants/redis-prefixes';
 import { ChangePasswordInput, LoginInput, RegisterInput } from '@dtos/auth.dto';
 import { IUser, IUserModel } from '@models/user.model';
-import { UserResponse } from '@resolvers/user.resolver';
-import { LoginResponse } from '@resolvers/auth.resolver';
-import { BooleanResponse } from '@responses';
+import { LoginResponse } from '@responses/auth.response';
+import { BooleanResponse } from '@responses/common.response';
+import { UserResponse } from '@responses/user.response';
 import { transformUser } from '@services/utils/transform';
 import { createConfirmationUrl, createForgotPasswordUrl, sendEmail } from '@utils/email';
 import { createAccessToken, createRefreshToken, sendRefreshToken } from '@utils/token';
@@ -42,7 +42,7 @@ class AuthService {
       return {
         errors: [
           {
-            message: req.t('auth.user_does_not_exist'),
+            message: req.t('auth.account_does_not_exist'),
           },
         ],
       };
@@ -63,7 +63,7 @@ class AuthService {
       return {
         errors: [
           {
-            message: req.t('auth.accont_confirmation_expired'),
+            message: req.t('auth.account_confirmation_expired'),
           },
         ],
       };
@@ -84,7 +84,7 @@ class AuthService {
       return {
         errors: [
           {
-            message: req.t('auth.user_does_not_exist'),
+            message: req.t('auth.account_does_not_exist'),
           },
         ],
       };
@@ -103,7 +103,7 @@ class AuthService {
       return {
         errors: [
           {
-            message: req.t('auth.user_does_not_exist'),
+            message: req.t('auth.account_does_not_exist'),
           },
         ],
       };
@@ -122,7 +122,7 @@ class AuthService {
       return {
         errors: [
           {
-            message: req.t('auth.unvalidated_user', { email }),
+            message: req.t('auth.unvalidated_account', { email }),
           },
         ],
       };
@@ -154,7 +154,7 @@ class AuthService {
       return {
         errors: [
           {
-            message: req.t('auth.user_already_exist', { email }),
+            message: req.t('auth.account_already_exist', { email }),
           },
         ],
       };

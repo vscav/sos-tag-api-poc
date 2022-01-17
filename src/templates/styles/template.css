@@ -1,0 +1,50 @@
+a, a:-webkit-any-link {
+  cursor: pointer;
+  text-decoration: none;
+  color: unset;
+}
+
+.main {
+  font-family: Helvetica, sans-serif;
+  color: #333333;
+  text-align: center;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.container {
+  font-size: 16px;
+  text-align: left;
+}
+
+.header,
+.footer {
+  line-height: 150%;
+}
+
+.header .greetings {
+  font-size: 20px;
+}
+
+.header .content {
+  margin: 15px 0;
+}
+
+.link-button {
+  background: #0b1f50;
+  padding: 10px 14px;
+  min-width: 200px;
+  color: #fff !important;
+  text-decoration: none;
+  display: inline-block;
+  font-weight: bold;
+  text-align: center;
+  letter-spacing: 0.5px;
+  border-radius: 4px;
+}
+
+.footer .signature {
+  color: #828282;
+  margin: 15px 0 75px;
+}

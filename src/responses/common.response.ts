@@ -1,4 +1,4 @@
-import { ClassType, Field, ObjectType } from 'type-graphql';
+import { ClassType, Field, Int, ObjectType } from 'type-graphql';
 
 const SingleObjectResponse = <T>(TItemSchema: ClassType<T>): any => {
   @ObjectType({ description: 'Generic single object response', isAbstract: true })
@@ -20,13 +20,29 @@ const ObjectsResponse = <T>(TItemSchema: ClassType<T>): any => {
   return GenericObjectsResponse;
 };
 
+const PaginatedResponse = <T>(TItemClass: ClassType<T>): any => {
+  @ObjectType({ description: 'Generic paginated response', isAbstract: true })
+  abstract class GenericPaginatedResponse extends Errors {
+    @Field(() => [TItemClass])
+    items: T[];
+    @Field(() => Int)
+    currentPage: number;
+    @Field(() => Int)
+    totalPages: number;
+    @Field()
+    hasMore: boolean;
+  }
+
+  return GenericPaginatedResponse;
+};
+
 @ObjectType({ description: 'Error with message' })
 class SimpleError {
   @Field()
   message: string;
 }
 
-@ObjectType({ description: 'Error with message and the field associated' })
+@ObjectType({ description: 'Error with message and the associated field' })
 class FieldError extends SimpleError {
   @Field()
   field: string;
@@ -41,4 +57,4 @@ class Errors {
 @ObjectType({ description: 'Boolean response' })
 class BooleanResponse extends SingleObjectResponse(Boolean) {}
 
-export { BooleanResponse, Errors, FieldError, ObjectsResponse, SimpleError, SingleObjectResponse };
+export { BooleanResponse, Errors, FieldError, ObjectsResponse, PaginatedResponse, SimpleError, SingleObjectResponse };

@@ -2,6 +2,7 @@ import { ContextPayload } from '@interfaces/context.interface';
 import tokenConfig from '@interfaces/token.interface';
 import accountModel, { IUser } from '@models/user.model';
 import config from 'config';
+import 'dotenv/config';
 import { Request, Response } from 'express';
 import { sign, verify } from 'jsonwebtoken';
 
@@ -50,7 +51,7 @@ const refreshToken = async (req: Request, res: Response) => {
   }
 
   // Refresh token is valid and we can send back an access token
-  const account: IUser = await accountModel.findOne({ _id: payload.accountId });
+  const account: IUser = await accountModel.findOne({ _id: payload.userId });
 
   if (!account) {
     return res.send({ ok: false, accessToken: '' });

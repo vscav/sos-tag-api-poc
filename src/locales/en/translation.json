@@ -1,7 +1,7 @@
 {
   "auth": {
     "account_already_exist": "An account associated to {{email}} already exists",
-    "accont_confirmation_expired": "Account confirmation link has expired. A new email needs to be sent to confirm this account.",
+    "account_confirmation_expired": "Account confirmation link has expired. A new email needs to be sent to confirm this account.",
     "account_does_not_exist": "This account does not exist",
     "incorrect_password": "Password is incorrect",
     "password_modification_expired": "Password modification link has expired. A new email needs to be sent to change this account password.",
@@ -13,14 +13,14 @@
       "greetings": "Hi {{name}}",
       "body": "Thanks for creating an account. Please verify your email address by clicking on the button below.",
       "link": "Verify email address",
-      "footer": "SOS-Tag team"
+      "signature": "SOS-Tag team"
     },
     "change_password": {
       "subject": "Change your password",
       "greetings": "Hi {{name}}",
       "body": "In order to update your password, please follow the link by clicking on the button below.",
       "link": "Change password",
-      "footer": "SOS-Tag team"
+      "signature": "SOS-Tag team"
     }
   },
   "error": {
